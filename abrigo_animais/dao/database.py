@@ -32,7 +32,7 @@ def init_db() -> None:
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Tabela de usuários do sistema (operadores do abrigo)
+    # Tabela de usuários do sistema
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuario (
             id        INTEGER PRIMARY KEY AUTOINCREMENT,
