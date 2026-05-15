@@ -1,7 +1,7 @@
 """
 dao/usuario_dao.py
-REQ-C1: controle de tentativas de login (bloqueio após 5 falhas)
-REQ-C2: senhas armazenadas com bcrypt (hash + salt)
+REQ-C1 - controle de tentativas de login (bloqueio após 5 falhas)
+REQ-C2 - senhas armazenadas com bcrypt (hash + salt)
 """
 
 from dao.database import get_connection
