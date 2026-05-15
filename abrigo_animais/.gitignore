@@ -1,0 +1,11 @@
+# REQ-B2: banco de dados nunca versionado
+abrigo.db
+*.db
+
+# Logs e cache
+__pycache__/
+*.pyc
+*.pyo
+logs/
+*.log
+.env
