@@ -1,9 +1,9 @@
 """
 controller/adocao_controller.py
-REQ-B3: validações internas que impedem spoofing (CWE-290).
-        O controller valida o estado do negócio independentemente
-        de como foi chamado (via CLI ou import direto).
-REQ-A1: confirmação dupla tratada na View; log de auditoria aqui.
+REQ-A3 (CWE-290): adoção exige sessão autenticada (ver util/sessao.py);
+        chamada direta sem sessão é barrada antes de gravar.
+REQ-B3: valida existência e estado do animal/tutor independentemente de quem chama.
+REQ-A1: confirmação dupla fica na View; log de auditoria aqui.
 """
 
 import datetime
@@ -12,6 +12,7 @@ from dao.adocao_dao import AdocaoDAO
 from dao.animal_dao import AnimalDAO
 from dao.tutor_dao import TutorDAO
 from dao.log_dao import LogDAO
+from util.sessao import validar_sessao
 
 _adocao_dao = AdocaoDAO()
 _animal_dao = AnimalDAO()
@@ -19,12 +20,23 @@ _tutor_dao = TutorDAO()
 _log = LogDAO()
 
 
-def realizar_adocao(animal_id: int, tutor_id: int,
-                    usuario_logado: str = "sistema") -> Adocao:
+def realizar_adocao(animal_id: int, tutor_id: int, sessao=None) -> Adocao:
     """
-    REQ-B3: valida existência e estado do animal/tutor ANTES de persistir.
-    Raise ValueError para qualquer condição inválida.
+    REQ-A3: exige sessão autenticada. REQ-B3: valida animal/tutor antes de gravar.
+    Levanta PermissionError (origem) ou ValueError (regra de negócio).
     """
+    # REQ-A3: sem sessão válida nem chega a olhar os dados
+    if not validar_sessao(sessao):
+        _log.registrar(
+            "ADOCAO_NEGADA",
+            usuario=getattr(sessao, "username", None),
+            detalhe="Origem não autorizada: sessão inválida ou ausente."
+        )
+        raise PermissionError(
+            "Origem não autorizada: é preciso estar logado para adotar."
+        )
+    usuario_logado = sessao.username
+
     # --- Validação de tipos (REQ-C4) ---
     try:
         animal_id = int(animal_id)

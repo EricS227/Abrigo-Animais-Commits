@@ -3,6 +3,7 @@ controller/auth_controller.py
 REQ-C1: bloqueio após 5 tentativas inválidas (CWE-307)
 REQ-C2: bcrypt com salt para armazenamento de senha (CWE-916)
 REQ-C3: log de auditoria para login/logout/cadastro
+REQ-A3: login OK abre a sessão usada para liberar operações sensíveis.
 """
 
 import datetime
@@ -12,6 +13,7 @@ from model.usuario import Usuario
 from dao.usuario_dao import UsuarioDAO
 from dao.log_dao import LogDAO
 from util.validacao import validar_username, validar_senha
+from util.sessao import iniciar_sessao
 
 _usuario_dao = UsuarioDAO()
 _log = LogDAO()
@@ -98,5 +100,6 @@ def autenticar(username: str, senha: str) -> Usuario:
 
     # Login bem-sucedido
     _usuario_dao.resetar_tentativas(username)
+    iniciar_sessao(username)   # REQ-A3
     _log.registrar("LOGIN_SUCESSO", usuario=username)
     return usuario
