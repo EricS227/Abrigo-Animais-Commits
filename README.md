@@ -17,7 +17,7 @@ Sistema CLI de gerenciamento de abrigo de animais com foco em segurança: prepar
 
 ```bash
 git clone https://github.com/EricS227/Roku-Shichi-Sechs-Sieben.git
-cd Roku-Shichi-Sechs-Sieben/abrigo_animais
+cd Abrigo-Animais-Commits/abrigo_animais
 pip install -r requirements.txt
 python main.py
 ```
