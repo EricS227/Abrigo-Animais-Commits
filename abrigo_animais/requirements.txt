@@ -1,1 +1,7 @@
 bcrypt>=4.0.0
+
+# REQ-A2/B2 — criptografia do banco em repouso (SQLCipher / AES-256).
+# Em Windows e na maioria dos Linux/macOS o wheel ja vem com a lib nativa.
+# Se a instalacao falhar no seu ambiente, remova a linha abaixo: o sistema
+# cai automaticamente para sqlite3 + chmod 600 (ver dao/database.py).
+sqlcipher3>=0.6.0
