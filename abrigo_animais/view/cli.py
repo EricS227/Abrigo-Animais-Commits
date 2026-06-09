@@ -13,9 +13,11 @@ import controller.animal_controller as animal_ctrl
 import controller.tutor_controller as tutor_ctrl
 import controller.adocao_controller as adocao_ctrl
 from dao.log_dao import LogDAO
+from util.sessao import obter_sessao_ativa, encerrar_sessao
 
 _log = LogDAO()
 _usuario_logado = None   # guarda username após login
+_sessao = None           # REQ-A3: sessão do login atual
 
 
 # ──────────────────────────────────────────────
@@ -113,7 +115,7 @@ def tela_cadastro_usuario():
 
 def tela_login():
     """T3 — Login com proteção contra força bruta."""
-    global _usuario_logado
+    global _usuario_logado, _sessao
     _limpar()
     _titulo("T3 — AUTENTICAÇÃO")
     print("  Requisitos: REQ-C1 (bloqueio) | REQ-C2 (bcrypt) | REQ-C3 (log)\n")
@@ -124,6 +126,7 @@ def tela_login():
     try:
         usuario = auth_ctrl.autenticar(username, senha)
         _usuario_logado = usuario.username
+        _sessao = obter_sessao_ativa()   # REQ-A3
         print(f"\n  ✔ Bem-vindo, {_usuario_logado}!")
         _pause()
         menu_principal()
@@ -162,6 +165,7 @@ def menu_principal():
             tela_logs()
         elif opcao == "0":
             _log.registrar("LOGOUT", usuario=_usuario_logado)
+            encerrar_sessao()   # REQ-A3: derruba a sessão no logout
             break
         else:
             print("  Opção inválida.")
@@ -343,10 +347,10 @@ def _realizar_adocao():
             return
 
         adocao = adocao_ctrl.realizar_adocao(
-            int(animal_id), int(tutor_id), usuario_logado=_usuario_logado
+            int(animal_id), int(tutor_id), sessao=_sessao   # REQ-A3
         )
         print(f"\n  ✔ Adoção registrada: {adocao}")
-    except ValueError as e:
+    except (ValueError, PermissionError) as e:
         print(f"\n  ERRO: {e}")
     _pause()
 
